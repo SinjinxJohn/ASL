@@ -19,6 +19,7 @@ from keras.models import load_model
 from flask import Flask, request,render_template,redirect, url_for
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
+from PIL import Image
 
 app=Flask(__name__,static_url_path='/static')
 
@@ -31,17 +32,12 @@ print('Model loaded. Check http://127.0.0.1:5000/')
 
 
 def model_predict(img_path, model):
-    img = load_img(img_path, target_size=(64, 64))
+    img = Image.open(img_path)
+    img = img.resize((64, 64)) 
 
 
-    # Preprocessing the image
-    x = img_to_array(img)
-    # x = np.true_divide(x, 255)
+    x = np.array(img)
     x = np.expand_dims(x, axis=0)
-
-    # Be careful how your trained model deals with the input
-    # otherwise, it won't make correct prediction!
-    # x = preprocess_input(x, mode='caffe')
 
     preds = model.predict(x)
     return preds
