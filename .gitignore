@@ -1,0 +1,5 @@
+# Ignore all virtual environment files and directories
+/asl/
+/asl-*/
+
+# Other entries in your .gitignore file...

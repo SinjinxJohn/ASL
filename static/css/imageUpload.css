@@ -1,0 +1,32 @@
+body {
+    text-align: center;
+    background-color: rgb(33, 37, 41);
+    color: rgb(255, 255, 255);
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+#imageInput {
+    display: none;
+}
+
+.btn {
+    background-color: rgb(245, 98, 58);
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 30px;
+}
+
+img {
+    max-width: 80%;
+    max-height: 400px;
+    margin-top: 20px;
+}
