@@ -6,11 +6,9 @@ import glob
 import re
 import numpy as np
 
-from keras.applications.imagenet_utils import decode_predictions
-from keras.applications.imagenet_utils import preprocess_input
-from keras.preprocessing.image import load_img, img_to_array
-from keras.models import load_model 
-
+from keras.applications.imagenet_utils import preprocess_input, decode_predictions
+from keras.models import load_model
+from keras.preprocessing import image
 
 
 
@@ -19,7 +17,6 @@ from keras.models import load_model
 from flask import Flask, request,render_template,redirect, url_for
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
-from PIL import Image
 
 app=Flask(__name__,static_url_path='/static')
 
@@ -32,12 +29,16 @@ print('Model loaded. Check http://127.0.0.1:5000/')
 
 
 def model_predict(img_path, model):
-    img = Image.open(img_path)
-    img = img.resize((64, 64)) 
+    img = image.load_img(img_path, target_size=(64, 64))
 
-
-    x = np.array(img)
+    # Preprocessing the image
+    x = image.img_to_array(img)
+    # x = np.true_divide(x, 255)
     x = np.expand_dims(x, axis=0)
+
+    # Be careful how your trained model deals with the input
+    # otherwise, it won't make correct prediction!
+    # x = preprocess_input(x, mode='caffe')
 
     preds = model.predict(x)
     return preds
