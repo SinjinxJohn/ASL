@@ -13,7 +13,8 @@ from keras.preprocessing import image
 
 
 
-
+from PIL import Image
+# import numpy as np
 from flask import Flask, request,render_template,redirect, url_for
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
@@ -28,17 +29,12 @@ model.make_predict_function()
 print('Model loaded. Check http://127.0.0.1:5000/')     
 
 
-def model_predict(img_path, model):
-    img = image.load_img(img_path, target_size=(64, 64))
+def model_predict(image, model):
+    img = Image.open(image)
+    img = img.resize((64, 64))
 
-    # Preprocessing the image
-    x = image.img_to_array(img)
-    # x = np.true_divide(x, 255)
+    x = np.array(img)
     x = np.expand_dims(x, axis=0)
-
-    # Be careful how your trained model deals with the input
-    # otherwise, it won't make correct prediction!
-    # x = preprocess_input(x, mode='caffe')
 
     preds = model.predict(x)
     return preds
@@ -55,9 +51,9 @@ def uploadPage():
 def predict():
     # if request.method=='POST':
     imageFile = request.files['imageFile']
-    imagePath = "./images/"+imageFile.filename
-    imageFile.save(imagePath)
-    preds = model_predict(imagePath, model)
+    # imagePath = "./images/"+imageFile.filename
+    # imageFile.save(imagePath)
+    preds = model_predict(imageFile, model)
     top_prediction = np.argmax(preds)
     class_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'del', 'nothing', 'space']
 
