@@ -6,9 +6,11 @@ import glob
 import re
 import numpy as np
 
-from keras.applications.imagenet_utils import preprocess_input, decode_predictions
-from keras.models import load_model
-from keras.preprocessing import image
+from keras.applications.imagenet_utils import decode_predictions
+from keras.applications.imagenet_utils import preprocess_input
+from keras.preprocessing.image import load_img, img_to_array
+from keras.models import load_model 
+
 
 
 
@@ -29,10 +31,11 @@ print('Model loaded. Check http://127.0.0.1:5000/')
 
 
 def model_predict(img_path, model):
-    img = image.load_img(img_path, target_size=(64, 64))
+    img = load_img(img_path, target_size=(64, 64))
+
 
     # Preprocessing the image
-    x = image.img_to_array(img)
+    x = img_to_array(img)
     # x = np.true_divide(x, 255)
     x = np.expand_dims(x, axis=0)
 
