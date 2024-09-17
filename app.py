@@ -1,4 +1,5 @@
 from __future__ import division, print_function
+from datetime import datetime
 import tempfile
 import pyrebase
 import sys
@@ -10,10 +11,11 @@ from keras.applications.imagenet_utils import preprocess_input, decode_predictio
 from keras.models import load_model
 from keras.preprocessing import image
 from PIL import Image
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
 import requests
+from gtts import gTTS
 from io import BytesIO
 
 config = {
@@ -78,10 +80,42 @@ def predict():
         result = class_labels[top_prediction]
 
         os.remove(temp_file_path)
-        return render_template('image_upload.html', result=result)
+
+        asr_to_speech_url = 'http://127.0.0.1:3000/asr_to_speech'
+        response = requests.post(asr_to_speech_url,json={'recognized_text':result})
+
+        if response.status_code == 200:
+            audio_file = response.json().get('audio_file')
+            return render_template('image_upload.html', result=result, audio_file=audio_file)
+        else:
+            return "Error in text-to-speech conversion", response.status_code
+        # return render_template('image_upload.html', result=result)
     except Exception as e:
         print(e)
         return str(e)
+
+@app.route('/asr_to_speech', methods=['POST'])
+def asr_to_speech():
+    try:
+        data = request.json
+        recognized_text = data.get('recognized_text', '')  # Text from ASL recognition model
+        
+        if not recognized_text:
+            return jsonify({'message': 'No recognized text provided'}), 400
+        
+        tts_message = f"The predicted word or letter is {recognized_text}"
+        # Generate speech from the recognized text
+        tts = gTTS(text=tts_message, lang='en')
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        audio_file_name = f'output_{timestamp}.mp3'
+        audio_file_path = os.path.join('static', audio_file_name)
+        tts.save(audio_file_path)
+        
+        return jsonify({'message': 'Speech generated', 'audio_file': audio_file_name}), 200
+    
+    except Exception as e:
+        print(e)
+        return str(e), 500
 
 if __name__ == '__main__':
     app.run(port=3000, debug=True)

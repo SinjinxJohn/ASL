@@ -9,15 +9,22 @@
         <h1>Image Upload</h1>
         <h2 class="sizeInc">Upload an Image for the sign for which translation is required</h2>
         <form action="/predict" method="post" enctype="multipart/form-data">
-            
-            <input type="file" class="form-control"  name="imageFile">
-            <!-- <label class="custom-file-label" for="imageUpload">Choose file</label> -->
-       
-    <button type="submit" class="btn btn-primary mt-3">Upload</button>
-</form>
-<div class="mt-4">
-    <p>Prediction: The Person is saying the letter: {{ result }}</p>
-</div>
+            <input type="file" class="form-control" name="imageFile">
+            <button type="submit" class="btn btn-primary mt-3">Upload</button>
+        </form>
+
+        <!-- Display Prediction and Audio Player -->
+        {% if result %}
+        <div class="mt-4">
+            <p>Prediction: The Person is saying the letter: {{ result }}</p>
+            {% if audio_file %}
+            <audio controls>
+                <source src="{{ url_for('static', filename=audio_file) }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
     <script src="js/IU.js"></script>
 </body>
